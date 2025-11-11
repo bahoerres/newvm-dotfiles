@@ -51,9 +51,36 @@ install_tools() {
 
   # Fastfetch
   print_status "Installing fastfetch..."
-  sudo add-apt-repository ppa:zhangsongcui3371/fastfetch -y
-  sudo apt update
-  sudo apt install -y fastfetch
+  if ! command -v fastfetch &>/dev/null; then
+    # Get latest release URL
+    FASTFETCH_URL=$(curl -s https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest | grep "browser_download_url.*linux-amd64.deb" | cut -d '"' -f 4)
+    curl -sL "$FASTFETCH_URL" -o /tmp/fastfetch.deb
+    sudo dpkg -i /tmp/fastfetch.deb
+    rm /tmp/fastfetch.deb
+  else
+    print_warning "Fastfetch already installed, skipping..."
+  fi
+
+  # Eza (modern ls replacement)
+  print_status "Installing eza..."
+  if ! command -v eza &>/dev/null; then
+    sudo mkdir -p /etc/apt/keyrings
+    wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+    echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
+    sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
+    sudo apt update
+    sudo apt install -y eza
+  else
+    print_warning "Eza already installed, skipping..."
+  fi
+
+  # Zoxide (smarter cd command)
+  print_status "Installing zoxide..."
+  if ! command -v zoxide &>/dev/null; then
+    curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+  else
+    print_warning "Zoxide already installed, skipping..."
+  fi
 
   # Starship
   print_status "Installing Starship..."
