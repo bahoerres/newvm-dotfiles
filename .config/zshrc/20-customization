@@ -1,0 +1,108 @@
+# -----------------------------------------------------
+# CUSTOMIZATION (plugins, UI, power completion)
+# -----------------------------------------------------
+
+# --- FZF (use Arch-provided scripts: faster than `fzf --zsh`)
+[[ -r /usr/share/fzf/key-bindings.zsh ]] && source /usr/share/fzf/key-bindings.zsh
+[[ -r /usr/share/fzf/completion.zsh   ]] && source /usr/share/fzf/completion.zsh
+
+# --- Suggestions engine (choose ONE; leave the other commented)
+# A) zsh-autocomplete (richer; replaces autosuggestions)
+# source ~/.zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+# zstyle ':autocomplete:*' min-input 1
+# zstyle ':completion:*' menu select
+
+# B) zsh-autosuggestions (lighter; pairs nicely with fzf history)
+source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+ZSH_AUTOSUGGEST_STRATEGY=(completion history)
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+bindkey '^F' autosuggest-accept          # accept suggestion with Ctrl-F
+
+# --- Syntax highlighting (MUST be last among plugins)
+source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+
+# =========================
+# Power-completion extras
+# =========================
+
+# Show helpful messages while completing
+zstyle ':completion:*:messages' format '%F{cyan}%d%f'
+zstyle ':completion:*:warnings' format '%F{red}%d%f'
+
+# Prefer commands before files when both match
+zstyle ':completion:*' accept-exact '*(N)'
+
+# Don’t offer . and .. unless explicitly wanted
+zstyle ':completion:*' ignore-parents parent pwd
+
+# Sort by relevance for certain commands
+zstyle ':completion:*:(git|kubectl|helm|docker|podman):*' list-grouped true
+
+# Case-insensitive host completion (ssh, scp,…)
+zstyle ':completion:*:(ssh|scp|sftp):*' hosts-case-insensitive true
+
+# Service helpers: make `sudo -E` etc complete flags & subcommands properly
+compdef _sudo sudo
+
+# Better `cd` completion (hidden dirs only if asked)
+zstyle ':completion:*:cd:*' ignore-parents parent pwd
+zstyle ':completion:*:cd:*' tag-order local-directories directory-stack
+
+# Complete env vars with descriptions
+zstyle ':completion:*:parameters' list-colors '=(#b) #([a-zA-Z_]#)=[0-9]#==34=33'
+
+# Make kill completion pretty
+zstyle ':completion:*:*:kill:*' menu yes select
+zstyle ':completion:*:*:kill:*' force-list always
+
+# Enable completing inside words (foo<Tab>bar)
+setopt completeinword
+
+# Smarter correction (don’t autocorrect commands you typed with paths)
+setopt nocorrect
+alias cp='nocorrect cp' mv='nocorrect mv' mkdir='nocorrect mkdir' # keep these raw
+
+
+# =========================
+# Micro-utilities & keybinds
+# =========================
+
+# FZF-powered directory jump: Ctrl-G to jump to a child dir
+fzf-cd-widget() {
+  local dir
+  dir=$(fd -t d -H . 2>/dev/null | fzf --preview 'exa -1 --icons --color=always {}' --height=40%) || return
+  cd "$dir"
+  zle reset-prompt
+}
+zle     -N   fzf-cd-widget
+bindkey '^G' fzf-cd-widget
+
+# FZF history search already on Ctrl-R from key-bindings.zsh.
+# Add Ctrl-S for forward search (if your tty allows it)
+stty -ixon 2>/dev/null
+bindkey '^S' history-incremental-search-forward
+
+# Quick extract (x file.tgz, x file.zip, …)
+x () {
+  local f="$1"
+  [[ -z "$f" ]] && echo "usage: x <archive>" && return 1
+  case "$f" in
+    *.tar.bz2)  tar xjf "$f"   ;;
+    *.tar.gz)   tar xzf "$f"   ;;
+    *.tbz2)     tar xjf "$f"   ;;
+    *.tgz)      tar xzf "$f"   ;;
+    *.tar)      tar xf  "$f"   ;;
+    *.zip)      unzip   "$f"   ;;
+    *.7z)       7z x    "$f"   ;;
+    *.rar)      unrar x "$f"   ;;
+    *) echo "don't know how to extract '$f'"; return 2 ;;
+  esac
+}
+
+# Shortcuts
+alias ls='exa --group-directories-first --icons'
+alias ll='ls -lah'
+alias grep='grep --color=auto'
+alias df='df -h'
+

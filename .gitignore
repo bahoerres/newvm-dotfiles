@@ -1,0 +1,16 @@
+# Backup files
+*.backup
+*.bak
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Vim swap files
+*.swp
+*.swo
+
+# Ignore private/sensitive configs if needed
+# Uncomment as necessary:
+# config/private/
