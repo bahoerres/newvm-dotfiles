@@ -16,13 +16,21 @@ alias shutdown='systemctl poweroff'
 alias v='$EDITOR'
 alias vim='$EDITOR'
 alias ssh='TERM=xterm-256color ssh'
-
 # -----------------------------------------------------
-# Window Managers
+# git
 # -----------------------------------------------------
 
-alias Qtile='startx'
-# Hyprland with Hyprland
+alias lg='lazygit'
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit -m'
+alias gp='git push'
+alias gpl='git pull'
+alias gst='git stash'
+alias gsp='git stash; git pull'
+alias gfo='git fetch origin'
+alias gcheck='git checkout'
+alias gcredential='git config credential.helper store'
 
 # -----------------------------------------------------
 # Scripts
