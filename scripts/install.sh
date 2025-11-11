@@ -109,14 +109,14 @@ install_tools() {
 
   # Zsh plugins
   print_status "Installing zsh plugins..."
-  mkdir -p ~/.zsh/plugins
+  mkdir -p ~/.zsh/
 
-  if [ ! -d ~/.zsh/plugins/zsh-syntax-highlighting ]; then
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh/plugins/zsh-syntax-highlighting
+  if [ ! -d ~/.zsh/zsh-syntax-highlighting ]; then
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh/zsh-syntax-highlighting
   fi
 
-  if [ ! -d ~/.zsh/plugins/zsh-autocomplete ]; then
-    git clone https://github.com/marlonrichert/zsh-autocomplete.git ~/.zsh/plugins/zsh-autocomplete
+  if [ ! -d ~/.zsh/zsh-autocomplete ]; then
+    git clone https://github.com/marlonrichert/zsh-autocomplete.git ~/.zsh/zsh-autocomplete
   fi
 }
 
