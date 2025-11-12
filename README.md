@@ -37,7 +37,7 @@ dotfiles/
 
 ```bash
 # Clone the repo
-git clone https://github.com/yourusername/dotfiles.git
+git clone https://github.com/bahoerres/dotfiles.git
 cd dotfiles
 
 # Run the installer
