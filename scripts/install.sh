@@ -43,26 +43,26 @@ install_tools() {
   print_status "Installing Neovim (AppImage extracted)..."
   if ! command -v nvim &>/dev/null; then
     # Download AppImage
-    curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+    curl -LO https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.appimage
 
     # Check if download was successful
-    if [ ! -s nvim.appimage ] || ! file nvim.appimage | grep -q "executable"; then
+    if [ ! -s nvim-linux-x86_64.appimage ] || ! file nvim-linux-x86_64.appimage | grep -q "executable"; then
       print_error "Failed to download neovim AppImage"
-      rm -f nvim.appimage
+      rm -f nvim-linux-x86_64.appimage
       exit 1
     fi
 
-    chmod u+x nvim.appimage
+    chmod u+x nvim-linux-x86_64.appimage
 
     # Extract the AppImage
-    ./nvim.appimage --appimage-extract
+    ./nvim-linux-x86_64.appimage --appimage-extract
 
     # Move extracted files to /usr/local
     sudo mv squashfs-root /usr/local/nvim
     sudo ln -s /usr/local/nvim/usr/bin/nvim /usr/local/bin/nvim
 
     # Cleanup
-    rm nvim.appimage
+    rm nvim-linux-x86_64.appimage
   else
     print_warning "Neovim already installed, skipping..."
   fi
