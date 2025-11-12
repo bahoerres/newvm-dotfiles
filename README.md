@@ -37,8 +37,8 @@ dotfiles/
 
 ```bash
 # Clone the repo
-git clone https://github.com/bahoerres/dotfiles.git
-cd dotfiles
+git clone https://github.com/bahoerres/newvm-dotfiles.git ~/dotfiles
+cd ~/dotfiles
 
 # Run the installer
 ./scripts/install.sh
