@@ -40,12 +40,9 @@ install_tools() {
   sudo apt install -y curl git build-essential software-properties-common zsh nodejs npm
 
   # Neovim
-  print_status "Installing Neovim (AppImage)..."
+  print_status "Installing Neovim (AppImage extracted)..."
   if ! command -v nvim &>/dev/null; then
-    # Install FUSE for AppImage support
-    sudo apt install -y fuse libfuse2
-
-    # Download and verify AppImage
+    # Download AppImage
     curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
 
     # Check if download was successful
@@ -56,7 +53,16 @@ install_tools() {
     fi
 
     chmod u+x nvim.appimage
-    sudo mv nvim.appimage /usr/local/bin/nvim
+
+    # Extract the AppImage
+    ./nvim.appimage --appimage-extract
+
+    # Move extracted files to /usr/local
+    sudo mv squashfs-root /usr/local/nvim
+    sudo ln -s /usr/local/nvim/usr/bin/nvim /usr/local/bin/nvim
+
+    # Cleanup
+    rm nvim.appimage
   else
     print_warning "Neovim already installed, skipping..."
   fi
