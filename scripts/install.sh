@@ -96,6 +96,20 @@ install_tools() {
   print_status "Installing zoxide..."
   if ! command -v zoxide &>/dev/null; then
     curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+
+    # Check if ~/.local/bin is in PATH
+    if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+      print_warning "~/.local/bin is not in your PATH"
+      read -p "Would you like to add it to your .zshrc? (Y/n): " -n 1 -r
+      echo ""
+      if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+        echo "" >>~/.zshrc
+        echo "# Add ~/.local/bin to PATH" >>~/.zshrc
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >>~/.zshrc
+        print_status "Added ~/.local/bin to PATH in .zshrc"
+        print_warning "You'll need to source ~/.zshrc or restart your shell for this to take effect"
+      fi
+    fi
   else
     print_warning "Zoxide already installed, skipping..."
   fi
@@ -121,20 +135,38 @@ install_tools() {
     print_status "Installing LazyVim..."
     git clone https://github.com/LazyVim/starter ~/.config/nvim
     rm -rf ~/.config/nvim/.git
+
+    # Link theme.lua if it exists in dotfiles
+    if [ -f "$DOTFILES_DIR/config/theme.lua" ]; then
+      print_status "Linking custom theme.lua..."
+      mkdir -p ~/.config/nvim/lua/plugins
+      ln -sf "$DOTFILES_DIR/config/theme.lua" ~/.config/nvim/lua/plugins/theme.lua
+    fi
   else
     print_warning "Neovim config already exists, skipping LazyVim install..."
+
+    # Still link theme.lua if it doesn't exist
+    if [ -f "$DOTFILES_DIR/config/theme.lua" ] && [ ! -f ~/.config/nvim/lua/plugins/theme.lua ]; then
+      print_status "Linking custom theme.lua..."
+      mkdir -p ~/.config/nvim/lua/plugins
+      ln -sf "$DOTFILES_DIR/config/theme.lua" ~/.config/nvim/lua/plugins/theme.lua
+    fi
   fi
 
   # Zsh plugins
   print_status "Installing zsh plugins..."
-  mkdir -p ~/.zsh/plugins
+  mkdir -p ~/.zsh
 
-  if [ ! -d ~/.zsh/plugins/zsh-syntax-highlighting ]; then
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh/plugins/zsh-syntax-highlighting
+  if [ ! -d ~/.zsh/zsh-syntax-highlighting ]; then
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh/zsh-syntax-highlighting
   fi
 
-  if [ ! -d ~/.zsh/plugins/zsh-autocomplete ]; then
-    git clone https://github.com/marlonrichert/zsh-autocomplete.git ~/.zsh/plugins/zsh-autocomplete
+  if [ ! -d ~/.zsh/zsh-autocomplete ]; then
+    git clone https://github.com/marlonrichert/zsh-autocomplete.git ~/.zsh/zsh-autocomplete
+  fi
+
+  if [ ! -d ~/.zsh/zsh-autosuggestions ]; then
+    git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.zsh/zsh-autosuggestions
   fi
 }
 
