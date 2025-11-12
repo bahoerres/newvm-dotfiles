@@ -42,7 +42,19 @@ install_tools() {
   # Neovim
   print_status "Installing Neovim (AppImage)..."
   if ! command -v nvim &>/dev/null; then
+    # Install FUSE for AppImage support
+    sudo apt install -y fuse libfuse2
+
+    # Download and verify AppImage
     curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+
+    # Check if download was successful
+    if [ ! -s nvim.appimage ] || ! file nvim.appimage | grep -q "executable"; then
+      print_error "Failed to download neovim AppImage"
+      rm -f nvim.appimage
+      exit 1
+    fi
+
     chmod u+x nvim.appimage
     sudo mv nvim.appimage /usr/local/bin/nvim
   else
@@ -109,14 +121,14 @@ install_tools() {
 
   # Zsh plugins
   print_status "Installing zsh plugins..."
-  mkdir -p ~/.zsh/
+  mkdir -p ~/.zsh/plugins
 
-  if [ ! -d ~/.zsh/zsh-syntax-highlighting ]; then
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh/zsh-syntax-highlighting
+  if [ ! -d ~/.zsh/plugins/zsh-syntax-highlighting ]; then
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh/plugins/zsh-syntax-highlighting
   fi
 
-  if [ ! -d ~/.zsh/zsh-autocomplete ]; then
-    git clone https://github.com/marlonrichert/zsh-autocomplete.git ~/.zsh/zsh-autocomplete
+  if [ ! -d ~/.zsh/plugins/zsh-autocomplete ]; then
+    git clone https://github.com/marlonrichert/zsh-autocomplete.git ~/.zsh/plugins/zsh-autocomplete
   fi
 }
 
