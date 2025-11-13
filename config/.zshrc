@@ -28,3 +28,8 @@ fi
 
 eval "$(atuin init zsh)"
 eval "$(starship init zsh)"
+eval "$(zoxide init zsh)"
+
+# Add ~/.local/bin to PATH
+export PATH="$HOME/.local/bin:$PATH"
+

@@ -70,6 +70,16 @@ install_docker_compose() {
     fi
 }
 
+install_lazydocker() {
+    print_status "Installing lazydocker..."
+    if ! command -v lazydocker &> /dev/null; then
+        curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash
+        print_status "Lazydocker installed to ~/.local/bin/lazydocker"
+    else
+        print_warning "Lazydocker already installed, skipping..."
+    fi
+}
+
 deploy_portainer_manager() {
     print_status "Deploying Portainer Manager..."
     
@@ -202,6 +212,7 @@ esac
 # Install Docker and Docker Compose
 install_docker
 install_docker_compose
+install_lazydocker
 
 # Deploy based on node type
 case $NODE_TYPE in
