@@ -14,3 +14,4 @@ Thumbs.db
 # Ignore private/sensitive configs if needed
 # Uncomment as necessary:
 # config/private/
+CLAUDE.md
