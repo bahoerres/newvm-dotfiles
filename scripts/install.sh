@@ -67,18 +67,6 @@ install_tools() {
         print_warning "Neovim already installed, skipping..."
     fi
 
-    # Fastfetch
-    print_status "Installing fastfetch..."
-    if ! command -v fastfetch &> /dev/null; then
-        # Get latest release URL
-        FASTFETCH_URL=$(curl -s https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest | grep "browser_download_url.*linux-amd64.deb" | cut -d '"' -f 4)
-        curl -sL "$FASTFETCH_URL" -o /tmp/fastfetch.deb
-        sudo dpkg -i /tmp/fastfetch.deb
-        rm /tmp/fastfetch.deb
-    else
-        print_warning "Fastfetch already installed, skipping..."
-    fi
-
     # Eza (modern ls replacement)
     print_status "Installing eza..."
     if ! command -v eza &> /dev/null; then
@@ -140,6 +128,73 @@ install_tools() {
         bash <(curl --proto '=https' --tlsv1.2 -sSf https://setup.atuin.sh)
     else
         print_warning "Atuin already installed, skipping..."
+    fi
+
+    # Lazydocker
+    print_status "Installing lazydocker..."
+    if ! command -v lazydocker &> /dev/null; then
+        LAZYDOCKER_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazydocker/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+        curl -Lo lazydocker.tar.gz "https://github.com/jesseduffield/lazydocker/releases/latest/download/lazydocker_${LAZYDOCKER_VERSION}_Linux_x86_64.tar.gz"
+        tar xf lazydocker.tar.gz lazydocker
+        sudo install lazydocker /usr/local/bin
+        rm lazydocker lazydocker.tar.gz
+    else
+        print_warning "Lazydocker already installed, skipping..."
+    fi
+
+    # lnav (log file navigator)
+    print_status "Installing lnav..."
+    if ! command -v lnav &> /dev/null; then
+        sudo apt install -y lnav
+    else
+        print_warning "lnav already installed, skipping..."
+    fi
+
+    # ncdu (disk usage analyzer)
+    print_status "Installing ncdu..."
+    if ! command -v ncdu &> /dev/null; then
+        sudo apt install -y ncdu
+    else
+        print_warning "ncdu already installed, skipping..."
+    fi
+
+    # duf (modern df alternative)
+    print_status "Installing duf..."
+    if ! command -v duf &> /dev/null; then
+        DUF_VERSION=$(curl -s "https://api.github.com/repos/muesli/duf/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+        curl -Lo duf.deb "https://github.com/muesli/duf/releases/latest/download/duf_${DUF_VERSION}_linux_amd64.deb"
+        sudo dpkg -i duf.deb
+        rm duf.deb
+    else
+        print_warning "duf already installed, skipping..."
+    fi
+
+    # bat (cat with syntax highlighting)
+    print_status "Installing bat..."
+    if ! command -v bat &> /dev/null && ! command -v batcat &> /dev/null; then
+        sudo apt install -y bat
+        # On Ubuntu/Debian, bat is installed as batcat due to name conflict
+        if command -v batcat &> /dev/null && ! command -v bat &> /dev/null; then
+            sudo ln -s /usr/bin/batcat /usr/local/bin/bat
+        fi
+    else
+        print_warning "bat already installed, skipping..."
+    fi
+
+    # grc (generic colourizer)
+    print_status "Installing grc..."
+    if ! command -v grc &> /dev/null; then
+        sudo apt install -y grc
+    else
+        print_warning "grc already installed, skipping..."
+    fi
+
+    # httpie (user-friendly HTTP client)
+    print_status "Installing httpie..."
+    if ! command -v http &> /dev/null; then
+        sudo apt install -y httpie
+    else
+        print_warning "httpie already installed, skipping..."
     fi
 
     # LazyVim

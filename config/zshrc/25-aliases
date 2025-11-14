@@ -6,9 +6,6 @@
 # General
 # -----------------------------------------------------
 alias c='clear'
-alias nf='fastfetch'
-alias pf='fastfetch'
-alias ff='fastfetch'
 alias ls='eza -a --icons=always'
 alias ll='eza -al --icons=always'
 alias lt='eza -a --tree --level=1 --icons=always'
@@ -37,7 +34,51 @@ alias gcredential='git config credential.helper store'
 # -----------------------------------------------------
 
 # -----------------------------------------------------
+# Docker
+# -----------------------------------------------------
+alias dc='docker compose'
+alias dps='docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
+alias dpsa='docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
+alias dlog='docker logs -f'
+alias dexec='docker exec -it'
+alias lzd='lazydocker'
+
+# -----------------------------------------------------
+# Colorized commands (grc)
+# -----------------------------------------------------
+if command -v grc &> /dev/null; then
+    alias ping='grc ping'
+    alias traceroute='grc traceroute'
+    alias netstat='grc netstat'
+    alias ss='grc ss'
+    alias tail='grc tail'
+fi
+
+# -----------------------------------------------------
+# Better cat (bat)
+# -----------------------------------------------------
+if command -v bat &> /dev/null; then
+    alias cat='bat --paging=never --style=plain'
+    alias ccat='bat --paging=never'  # cat with colors
+    alias bcat='bat'  # bat with pager
+fi
+
+# -----------------------------------------------------
+# Systemd shortcuts
+# -----------------------------------------------------
+alias svc-status='systemctl status'
+alias svc-start='sudo systemctl start'
+alias svc-stop='sudo systemctl stop'
+alias svc-restart='sudo systemctl restart'
+alias svc-enable='sudo systemctl enable'
+alias svc-disable='sudo systemctl disable'
+alias svc-failed='systemctl --failed'
+alias svc-list='systemctl list-units --type=service'
+
+# -----------------------------------------------------
 # System
 # -----------------------------------------------------
 alias update-grub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
+alias status='$HOME/dotfiles/scripts/status.sh'
+alias sys-update='$HOME/dotfiles/scripts/update.sh'
 

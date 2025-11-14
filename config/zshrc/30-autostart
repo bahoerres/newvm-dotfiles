@@ -8,13 +8,11 @@
 # cat ~/.cache/wal/sequences
 
 # -----------------------------------------------------
-# Fastfetch
+# System Status
 # -----------------------------------------------------
 if [[ $- == *i* ]] && [[ -t 1 ]]; then
-    fastfetch --config examples/13
-    if command -v fortune &> /dev/null; then
-        echo ""
-        fortune -s
-        echo ""
+    # Run status script if it exists
+    if [ -f "$HOME/dotfiles/scripts/status.sh" ]; then
+        "$HOME/dotfiles/scripts/status.sh"
     fi
 fi
