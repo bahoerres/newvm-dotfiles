@@ -37,7 +37,7 @@ install_tools() {
     sudo apt update && sudo apt upgrade -y
 
     print_status "Installing essential tools..."
-    sudo apt install -y curl git build-essential software-properties-common zsh nodejs npm
+    sudo apt install -y curl git build-essential software-properties-common zsh
 
     # Neovim
     print_status "Installing Neovim (AppImage extracted)..."
