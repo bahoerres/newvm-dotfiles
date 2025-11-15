@@ -16,7 +16,7 @@
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 ZSH_AUTOSUGGEST_STRATEGY=(completion history)
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
-bindkey '^F' autosuggest-accept          # accept suggestion with Ctrl-F
+bindkey '^E' autosuggest-accept          # accept suggestion with Ctrl-F
 
 # --- Syntax highlighting (MUST be last among plugins)
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
