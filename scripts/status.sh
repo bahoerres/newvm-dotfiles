@@ -51,9 +51,14 @@ echo ""
 
 # CPU and Memory
 CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | cut -d'%' -f1)
-MEM_INFO=$(free -h | awk '/^Mem:/ {printf "%s / %s (%.0f%%)", $3, $2, ($3/$2)*100}')
+# Use free -m to get megabytes for calculation, then convert to human-readable
+MEM_USED=$(free -m | awk '/^Mem:/ {print $3}')
+MEM_TOTAL=$(free -m | awk '/^Mem:/ {print $2}')
+MEM_PERCENT=$(awk "BEGIN {printf \"%.0f\", ($MEM_USED/$MEM_TOTAL)*100}")
+MEM_USED_GB=$(awk "BEGIN {printf \"%.1f\", $MEM_USED/1024}")
+MEM_TOTAL_GB=$(awk "BEGIN {printf \"%.1f\", $MEM_TOTAL/1024}")
 echo -e "${BOLD}CPU Usage:${NC} ${CPU_USAGE}%"
-echo -e "${BOLD}Memory:${NC} $MEM_INFO"
+echo -e "${BOLD}Memory:${NC} ${MEM_USED_GB}G / ${MEM_TOTAL_GB}G (${MEM_PERCENT}%)"
 echo ""
 
 # Disk usage check
@@ -99,8 +104,8 @@ if command -v docker &> /dev/null; then
             print_header "Docker Containers:"
             if [ "$RUNNING_CONTAINERS" -gt 0 ]; then
                 echo -e "${GREEN}  Running: $RUNNING_CONTAINERS${NC}"
-                docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' 2>/dev/null | tail -n +2 | while read -r line; do
-                    echo "    ✓ $line"
+                docker ps --format '{{.Names}}\t{{.Status}}' 2>/dev/null | while IFS=$'\t' read -r name status; do
+                    echo -e "    ${GREEN}✓${NC} $name - $status"
                 done
             fi
 
