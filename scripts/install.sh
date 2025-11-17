@@ -114,6 +114,18 @@ install_tools() {
         print_warning "Lazygit already installed, skipping..."
     fi
 
+    # GitHub CLI
+    print_status "Installing GitHub CLI..."
+    if ! command -v gh &> /dev/null; then
+        curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+        sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+        sudo apt update
+        sudo apt install -y gh
+    else
+        print_warning "GitHub CLI already installed, skipping..."
+    fi
+
     # Starship
     print_status "Installing Starship..."
     if ! command -v starship &> /dev/null; then
