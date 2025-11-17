@@ -26,7 +26,7 @@ ssh_only = true
 trim_at = ".local"
 
 [username]
-disabled = true
+disabled = false
 style_user = "bg:#504945 fg:#ebdbb2"
 style_root = "bg:#504945 fg:#fb4934"
 format = "[ $user]($style)"
