@@ -212,6 +212,5 @@ style = "bg:#504945 fg:#ebdbb2"
 format = "($style)"
 symbol = "  "
 
-
-ontainer]
+[container]
 disabled = true
