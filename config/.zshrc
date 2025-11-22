@@ -3,6 +3,7 @@
 # or by creating a folder ~/.config/zshrc/custom
 # with copies of files from ~/.config/zshrc 
 # -----------------------------------------------------
+export PATH="$HOME/.local/bin:$PATH"
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 # -----------------------------------------------------
@@ -29,7 +30,4 @@ fi
 eval "$(atuin init zsh)"
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh --cmd cd)"
-
-# Add ~/.local/bin to PATH
-export PATH="$HOME/.local/bin:$PATH"
 
