@@ -269,6 +269,22 @@ link_configs() {
     print_status "Linked zsh modules directory"
 }
 
+link_scripts() {
+    print_status "Linking scripts to ~/.local/bin..."
+    
+    # Create ~/.local/bin if it doesn't exist
+    mkdir -p "$HOME/.local/bin"
+    
+    # Link all scripts from dotfiles/scripts/ to ~/.local/bin
+    for script in "$DOTFILES_DIR/scripts"/*.sh; do
+        if [ -f "$script" ]; then
+            script_name=$(basename "$script" .sh)
+            ln -sf "$script" "$HOME/.local/bin/$script_name"
+            print_status "Linked $script_name"
+        fi
+    done
+}
+
 change_shell() {
     if [ "$SHELL" != "$(which zsh)" ]; then
         print_status "Changing default shell to zsh..."
