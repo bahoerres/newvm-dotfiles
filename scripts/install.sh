@@ -295,6 +295,45 @@ change_shell() {
     fi
 }
 
+setup_auto_sync() {
+    print_status "Setting up automated sync and updates..."
+
+    # Only set up if this is a git repo
+    if [ ! -d "$DOTFILES_DIR/.git" ]; then
+        print_warning "Not a git repository, skipping auto-sync setup"
+        return
+    fi
+
+    # Temporary crontab file
+    TEMP_CRON=$(mktemp)
+    crontab -l 2>/dev/null > "$TEMP_CRON" || true
+
+    # 1. Auto-pull dotfiles every 6 hours
+    SYNC_CMD="0 */6 * * * cd $DOTFILES_DIR && git pull --quiet >> $HOME/.dotfiles-sync.log 2>&1"
+    if ! grep -qF "git pull" "$TEMP_CRON" 2>/dev/null; then
+        echo "$SYNC_CMD" >> "$TEMP_CRON"
+        print_status "Added auto-sync cron job (pulls updates every 6 hours)"
+    else
+        print_warning "Auto-sync cron job already exists, skipping..."
+    fi
+
+    # 2. Run update check weekly (Sundays at 9am)
+    UPDATE_CHECK_CMD="0 9 * * 0 $DOTFILES_DIR/scripts/update.sh --check >> $HOME/.dotfiles-update-check.log 2>&1"
+    if ! grep -qF "update.sh --check" "$TEMP_CRON" 2>/dev/null; then
+        echo "$UPDATE_CHECK_CMD" >> "$TEMP_CRON"
+        print_status "Added weekly update check (Sundays at 9am)"
+    else
+        print_warning "Update check cron job already exists, skipping..."
+    fi
+
+    # Apply the new crontab
+    crontab "$TEMP_CRON"
+    rm "$TEMP_CRON"
+
+    print_status "Automation setup complete!"
+    print_info "Logs: ~/.dotfiles-sync.log and ~/.dotfiles-update-check.log"
+}
+
 show_completion_message() {
     echo ""
     print_status "Installation complete!"
@@ -350,7 +389,9 @@ fi
 
 if [ "$TOOLS_ONLY" = false ]; then
     link_configs
+    link_scripts
     change_shell
+    setup_auto_sync
 fi
 
 show_completion_message
