@@ -104,13 +104,30 @@ if command -v docker &> /dev/null; then
             print_header "Docker Containers:"
             if [ "$RUNNING_CONTAINERS" -gt 0 ]; then
                 echo -e "${GREEN}  Running: $RUNNING_CONTAINERS${NC}"
-                docker ps --format '{{.Names}}\t{{.Status}}' 2>/dev/null | while IFS=$'\t' read -r name status; do
-                    echo -e "    ${GREEN}✓${NC} $name - $status"
+                docker ps --format '{{.Names}}\t{{.Status}}\t{{.Ports}}' 2>/dev/null | while IFS=$'\t' read -r name status ports; do
+                    if [ -n "$ports" ]; then
+                        # Simplify port output: remove IPs and IPv6, keep just port mappings
+                        # Convert "0.0.0.0:8081->8080/tcp, [::]:8081->8080/tcp" to "8081->8080/tcp"
+                        simplified_ports=$(echo "$ports" | sed -E 's/0\.0\.0\.0://g; s/\[::\]://g' | tr ',' '\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | sort -u | paste -sd', ')
+
+                        # Container has exposed ports
+                        echo -e "    ${GREEN}✓${NC} $name - $status"
+                        echo -e "      ${CYAN}→${NC} $simplified_ports"
+                        echo ""
+                    else
+                        # No exposed ports
+                        echo -e "    ${GREEN}✓${NC} $name - $status"
+                        echo ""
+                    fi
                 done
             fi
 
             if [ "$STOPPED_CONTAINERS" -gt 0 ]; then
                 echo -e "${YELLOW}  Stopped: $STOPPED_CONTAINERS${NC}"
+                docker ps -a --filter "status=exited" --format '{{.Names}}\t{{.Status}}' 2>/dev/null | while IFS=$'\t' read -r name status; do
+                    echo -e "    ${YELLOW}⊘${NC} $name - $status"
+                    echo ""
+                done
             fi
             echo ""
         fi
