@@ -1,0 +1,97 @@
+# Global settings for all homelab hosts
+Host *
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+    StrictHostKeyChecking accept-new
+
+## REMOTE SYSTEMS
+# DO Droplet - Project Melon
+Host project-melon
+    HostName 129.212.189.49
+    User sysadmin
+
+# Linode Nanode
+Host ts-proxy
+    HostName ts-proxy.tail4d7a4.ts.net
+    User sysadmin
+    # Tailscale IP: 100.101.35.69
+
+## PROXMOX NODES (all on Tailscale)
+Host pvenet
+    HostName pvenet.tail4d7a4.ts.net
+    User root
+    # Tailscale IP: 100.126.94.58
+    # Local IP: 192.168.0.101
+
+Host pveserv
+    HostName pveserv.tail4d7a4.ts.net
+    User root
+    # Tailscale IP: 100.114.144.83
+    # Local IP: 192.168.0.102
+
+Host pvetop
+    HostName pvetop.tail4d7a4.ts.net
+    User root
+    # Tailscale IP: 100.127.87.73
+    # Local IP: 192.168.0.103
+
+## DOCKER HOSTS (all on Tailscale)
+Host docker-net
+    HostName docker-net.tail4d7a4.ts.net
+    User sysadmin
+    # Tailscale IP: 100.72.6.80
+    # Local IP: 192.168.0.109
+
+Host docker-serv
+    HostName docker-serv.tail4d7a4.ts.net
+    User sysadmin
+    # Tailscale IP: 100.88.1.39
+    # Local IP: 192.168.0.105
+
+Host ubuntu-gpu
+    HostName ubuntu-gpu.tail4d7a4.ts.net
+    User sysadmin
+    # Tailscale IP: 100.122.229.10
+    # Local IP: 192.168.0.29
+    # Legally obtained Linux ISOs
+
+## NETWORK INFRASTRUCTURE
+Host opnsense
+    HostName opnsense.tail4d7a4.ts.net
+    User root
+    # Tailscale IP: 100.127.159.50
+    # Local IP: 192.168.0.254
+
+## LXC CONTAINERS / VMs (no Tailscale - need local network or subnet routes via pvenet)
+# IOT Network (10.10.30.x)
+Host haos
+    HostName 10.10.30.130
+    User root
+    # Home Assistant on pvetop
+
+# Main LAN (192.168.0.x - accessible via Tailscale subnet routes)
+Host truenas
+    HostName 192.168.0.25
+    User blake
+
+Host unifi
+    HostName 192.168.0.50
+    User root
+    # Unifi Network Controller
+
+Host docker-dmz frigate
+    HostName 192.168.0.59
+    User root
+    # Docker host with Frigate NVR (formerly frigate VM)
+
+## WORKSTATIONS
+# User Network (192.168.20.x)
+Host omarchy-gem12
+    HostName 192.168.20.12
+    User blake
+    # AOOSTAR Wired
+
+Host omarchy-zentop
+    HostName 192.168.20.13
+    User blake
+    # Archlinux on ASUS Zenbook (via wifi)
