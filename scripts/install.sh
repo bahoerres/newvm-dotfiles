@@ -23,6 +23,10 @@ print_error() {
   echo -e "${RED}==>${NC} $1"
 }
 
+print_info() {
+  echo -e "${NC}$1"
+}
+
 backup_if_exists() {
   local file=$1
   if [ -e "$file" ] && [ ! -L "$file" ]; then
@@ -333,7 +337,7 @@ setup_auto_sync() {
   rm "$TEMP_CRON"
 
   print_status "Automation setup complete!"
-  printf "Logs: ~/.dotfiles-sync.log and ~/.dotfiles-update-check.log"
+  print_info "Logs: ~/.dotfiles-sync.log and ~/.dotfiles-update-check.log"
 }
 
 show_completion_message() {
