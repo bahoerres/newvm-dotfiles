@@ -87,16 +87,12 @@ install_tools() {
 
     # Check if ~/.local/bin is in PATH
     if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
-      print_warning "~/.local/bin is not in your PATH"
-      read -p "Would you like to add it to your .zshrc? (Y/n): " -n 1 -r
-      echo ""
-      if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-        echo "" >>~/.zshrc
-        echo "# Add ~/.local/bin to PATH" >>~/.zshrc
-        echo 'export PATH="$HOME/.local/bin:$PATH"' >>~/.zshrc
-        print_status "Added ~/.local/bin to PATH in .zshrc"
-        print_warning "You'll need to source ~/.zshrc or restart your shell for this to take effect"
-      fi
+      print_warning "~/.local/bin is not in your PATH, adding it automatically..."
+      echo "" >>~/.zshrc
+      echo "# Add ~/.local/bin to PATH" >>~/.zshrc
+      echo 'export PATH="$HOME/.local/bin:$PATH"' >>~/.zshrc
+      print_status "Added ~/.local/bin to PATH in .zshrc"
+      print_warning "You'll need to source ~/.zshrc or restart your shell for this to take effect"
     fi
   else
     print_warning "Zoxide already installed, skipping..."
@@ -137,7 +133,8 @@ install_tools() {
   # Atuin
   print_status "Installing Atuin..."
   if ! command -v atuin &>/dev/null; then
-    bash <(curl --proto '=https' --tlsv1.2 -sSf https://setup.atuin.sh)
+    # Run Atuin installer non-interactively
+    ATUIN_NO_INTERACTIVE=true bash <(curl --proto '=https' --tlsv1.2 -sSf https://setup.atuin.sh) || true
   else
     print_warning "Atuin already installed, skipping..."
   fi
@@ -288,8 +285,13 @@ link_scripts() {
 change_shell() {
   if [ "$SHELL" != "$(which zsh)" ]; then
     print_status "Changing default shell to zsh..."
-    chsh -s $(which zsh)
-    print_warning "Shell changed to zsh. You'll need to log out and back in for this to take effect."
+    # Only attempt if not running under sudo/automation
+    if [ -z "$SUDO_USER" ] && [ -t 0 ]; then
+      chsh -s $(which zsh)
+      print_warning "Shell changed to zsh. You'll need to log out and back in for this to take effect."
+    else
+      print_warning "Skipping shell change (running under automation). You can manually run: chsh -s \$(which zsh)"
+    fi
   else
     print_status "Default shell is already zsh"
   fi
