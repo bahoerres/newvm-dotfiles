@@ -143,12 +143,12 @@ EOF
 
 deploy_watchtower() {
     print_status "Deploying Watchtower..."
-    
+
     mkdir -p ~/docker/watchtower
     cat > ~/docker/watchtower/compose.yml <<'EOF'
 services:
   watchtower:
-    image: containrrr/watchtower:latest
+    image: nickfedor/watchtower:latest
     container_name: watchtower
     restart: unless-stopped
     environment:
@@ -162,7 +162,7 @@ EOF
 
     cd ~/docker/watchtower
     docker compose up -d
-    
+
     print_status "Watchtower deployed! (Updates containers daily at 4 AM)"
 }
 
