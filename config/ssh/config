@@ -79,7 +79,7 @@ Host unifi
     User root
     # Unifi Network Controller
 
-Host docker-dmz frigate
+Host docker-dmz 
     HostName 192.168.0.59
     User root
     # Docker host with Frigate NVR (formerly frigate VM)
@@ -87,7 +87,7 @@ Host docker-dmz frigate
 ## WORKSTATIONS
 # User Network (192.168.20.x)
 Host omarchy-gem12
-    HostName 192.168.20.12
+    HostName 192.168.0.12
     User blake
     # AOOSTAR Wired
 
