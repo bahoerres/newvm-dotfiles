@@ -1,0 +1,4 @@
+# -----------------------------------------------------
+# SYNTAX HIGHLIGHTING (must load after all aliases/functions)
+# -----------------------------------------------------
+source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

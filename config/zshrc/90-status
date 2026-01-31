@@ -1,0 +1,9 @@
+# -----------------------------------------------------
+# AUTOSTART
+# -----------------------------------------------------
+
+if [[ $- == *i* ]] && [[ -t 1 ]]; then
+    if [ -f "$HOME/dotfiles/scripts/status.sh" ]; then
+        "$HOME/dotfiles/scripts/status.sh"
+    fi
+fi

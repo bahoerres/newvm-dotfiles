@@ -1,0 +1,52 @@
+# -----------------------------------------------------
+# FUNCTIONS
+# -----------------------------------------------------
+
+# Tree view with configurable depth and optional path
+lt() {
+  local level=${1:-1}
+  local target=${2:-.}
+  eza -a --tree --level="$level" --icons=always "$target"
+}
+
+# Quick directory navigation up N levels
+up() {
+  local levels=${1:-1}
+  local path=""
+  for ((i=0; i<levels; i++)); do
+    path="../$path"
+  done
+  cd "$path" || return
+}
+
+# Create directory and cd into it
+mkcd() {
+  mkdir -p "$1" && cd "$1"
+}
+
+# Extract various archive types
+x() {
+  local f="$1"
+  [[ -z "$f" ]] && echo "usage: x <archive>" && return 1
+  [[ ! -f "$f" ]] && echo "'$f' is not a valid file" && return 1
+  case "$f" in
+    *.tar.bz2)  tar xjf "$f"   ;;
+    *.tar.gz)   tar xzf "$f"   ;;
+    *.tbz2)     tar xjf "$f"   ;;
+    *.tgz)      tar xzf "$f"   ;;
+    *.tar)      tar xf  "$f"   ;;
+    *.bz2)      bunzip2 "$f"   ;;
+    *.gz)       gunzip  "$f"   ;;
+    *.zip)      unzip   "$f"   ;;
+    *.7z)       7z x    "$f"   ;;
+    *.rar)      unrar x "$f"   ;;
+    *.Z)        uncompress "$f" ;;
+    *) echo "don't know how to extract '$f'"; return 2 ;;
+  esac
+}
+
+# Find and kill process by name
+killp() {
+  [[ -z "$1" ]] && echo "usage: killp <process_name>" && return 1
+  ps aux | grep -i "$1" | grep -v grep | awk '{print $2}' | xargs kill -9
+}

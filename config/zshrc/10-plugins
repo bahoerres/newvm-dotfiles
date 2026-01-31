@@ -1,0 +1,55 @@
+# -----------------------------------------------------
+# PLUGINS (fzf, autosuggestions, completion)
+# -----------------------------------------------------
+
+# --- FZF (use Arch-provided scripts: faster than `fzf --zsh`)
+[[ -r /usr/share/fzf/key-bindings.zsh ]] && source /usr/share/fzf/key-bindings.zsh
+[[ -r /usr/share/fzf/completion.zsh   ]] && source /usr/share/fzf/completion.zsh
+
+# FZF performance optimizations
+export FZF_DEFAULT_OPTS='--height 40% --reverse --border'
+
+# --- Autosuggestions
+source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+ZSH_AUTOSUGGEST_STRATEGY=(completion history)
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+bindkey '^E' autosuggest-accept
+
+# =========================
+# Power-completion extras
+# =========================
+
+zstyle ':completion:*:messages' format '%F{cyan}%d%f'
+zstyle ':completion:*:warnings' format '%F{red}%d%f'
+zstyle ':completion:*' accept-exact '*(N)'
+zstyle ':completion:*' ignore-parents parent pwd
+zstyle ':completion:*:(git|kubectl|helm|docker|podman):*' list-grouped true
+zstyle ':completion:*:(ssh|scp|sftp):*' hosts-case-insensitive true
+
+compdef _sudo sudo
+
+zstyle ':completion:*:cd:*' ignore-parents parent pwd
+zstyle ':completion:*:cd:*' tag-order local-directories directory-stack
+zstyle ':completion:*:parameters' list-colors '=(#b) #([a-zA-Z_]#)=[0-9]#==34=33'
+zstyle ':completion:*:*:kill:*' menu yes select
+zstyle ':completion:*:*:kill:*' force-list always
+
+setopt completeinword
+setopt nocorrect
+
+# =========================
+# Micro-utilities & keybinds
+# =========================
+
+# FZF-powered directory jump: Ctrl-G
+fzf-cd-widget() {
+  local dir
+  dir=$(fd -t d -H . 2>/dev/null | fzf --preview 'eza -1 --icons=always --color=always {}' --height=40%) || return
+  cd "$dir"
+  zle reset-prompt
+}
+zle     -N   fzf-cd-widget
+bindkey '^G' fzf-cd-widget
+
+stty -ixon 2>/dev/null
+bindkey '^S' history-incremental-search-forward
