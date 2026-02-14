@@ -4,94 +4,143 @@ Host *
     ServerAliveCountMax 3
     StrictHostKeyChecking accept-new
 
-## REMOTE SYSTEMS
-# DO Droplet - Project Melon
+###############################################################################
+## LOCAL ACCESS - Use these at home with Tailscale OFF
+## Fast direct connections via 10.69.x.x network
+###############################################################################
+
+## PROXMOX HOSTS (Servers VLAN 10.69.10.x)
+Host pvenet
+    HostName 10.69.10.11
+    User root
+
+Host pveserv
+    HostName 10.69.10.12
+    User root
+
+Host pvetop
+    HostName 10.69.10.13
+    User root
+
+## INFRASTRUCTURE (Servers VLAN 10.69.10.x)
+Host truenas
+    HostName 10.69.10.25
+    User root
+
+Host pbs
+    HostName 10.69.10.20
+    User root
+
+## DOCKER HOSTS (Services VLAN 10.69.69.x)
+Host docker-net
+    HostName 10.69.69.10
+    User sysadmin
+
+Host docker-netvm
+    HostName 10.69.69.11
+    User sysadmin
+
+Host docker-serv
+    HostName 10.69.69.20
+    User sysadmin
+
+Host gpu-serv
+    HostName 10.69.69.42
+    User sysadmin
+
+Host docker-top
+    HostName 10.69.69.69
+    User sysadmin
+
+Host docs
+    HostName 10.69.69.19
+    User sysadmin
+
+Host frigate
+    HostName 10.69.69.59
+    User sysadmin
+
+## IOT / SMART HOME (IoT VLAN 10.69.30.x)
+Host haos
+    HostName 10.69.30.10
+    User root
+
+## WORKSTATIONS (Me/Admin VLAN 10.69.20.x)
+Host gem12
+    HostName 10.69.20.12
+    User blake
+
+Host zentop
+    HostName 10.69.20.113
+    User blake
+
+###############################################################################
+## REMOTE ACCESS - Use these away from home with Tailscale ON
+## Access via Tailscale VPN (100.x.x.x or *.tail4d7a4.ts.net)
+###############################################################################
+
+## PROXMOX HOSTS
+Host pvenet-ts
+    HostName pvenet.tail4d7a4.ts.net
+    User root
+
+Host pveserv-ts
+    HostName pveserv.tail4d7a4.ts.net
+    User root
+
+Host pvetop-ts
+    HostName pvetop.tail4d7a4.ts.net
+    User root
+
+## DOCKER HOSTS
+Host docker-net-ts
+    HostName docker-net.tail4d7a4.ts.net
+    User sysadmin
+
+Host docker-serv-ts
+    HostName docker-serv.tail4d7a4.ts.net
+    User sysadmin
+
+Host gpu-serv-ts
+    HostName gpu-serv.tail4d7a4.ts.net
+    User sysadmin
+
+Host docker-top-ts
+    HostName docker-top.tail4d7a4.ts.net
+    User sysadmin
+
+## WORKSTATIONS
+Host zentop-ts
+    HostName omarchy-zenbook.tail4d7a4.ts.net
+    User blake
+
+###############################################################################
+## ALWAYS REMOTE - These are only accessible via internet/Tailscale
+###############################################################################
+
+# Hostinger VPS - Tailscale Exit Node & Caddy Reverse Proxy
+Host ts-proxy
+    HostName ts-proxy.tail4d7a4.ts.net
+    User sysadmin
+
+# DO Droplet - Project Melon (to be migrated to docs VM and decommissioned)
 Host project-melon
     HostName 129.212.189.49
     User sysadmin
 
-# Linode Nanode
-Host ts-proxy
-    HostName ts-proxy.tail4d7a4.ts.net
-    User sysadmin
-    # Tailscale IP: 100.101.35.69
-
-## PROXMOX NODES (all on Tailscale)
-Host pvenet
-    HostName pvenet.tail4d7a4.ts.net
-    User root
-    # Tailscale IP: 100.126.94.58
-    # Local IP: 192.168.0.101
-
-Host pveserv
-    HostName pveserv.tail4d7a4.ts.net
-    User root
-    # Tailscale IP: 100.114.144.83
-    # Local IP: 192.168.0.102
-
-Host pvetop
-    HostName pvetop.tail4d7a4.ts.net
-    User root
-    # Tailscale IP: 100.127.87.73
-    # Local IP: 192.168.0.103
-
-## DOCKER HOSTS (all on Tailscale)
-Host docker-net
-    HostName docker-net.tail4d7a4.ts.net
-    User sysadmin
-    # Tailscale IP: 100.72.6.80
-    # Local IP: 192.168.0.109
-
-Host docker-serv
-    HostName docker-serv.tail4d7a4.ts.net
-    User sysadmin
-    # Tailscale IP: 100.88.1.39
-    # Local IP: 192.168.0.105
-
-Host ubuntu-gpu
-    HostName ubuntu-gpu.tail4d7a4.ts.net
-    User sysadmin
-    # Tailscale IP: 100.122.229.10
-    # Local IP: 192.168.0.29
-    # Legally obtained Linux ISOs
-
-## NETWORK INFRASTRUCTURE
-Host opnsense
-    HostName opnsense.tail4d7a4.ts.net
-    User root
-    # Tailscale IP: 100.127.159.50
-    # Local IP: 192.168.0.254
-
-## LXC CONTAINERS / VMs (no Tailscale - need local network or subnet routes via pvenet)
-# IOT Network (10.10.30.x)
-Host haos
-    HostName 10.10.30.130
-    User root
-    # Home Assistant on pvetop
-
-# Main LAN (192.168.0.x - accessible via Tailscale subnet routes)
-Host truenas
-    HostName 192.168.0.25
-    User blake
-
-Host unifi
-    HostName 192.168.0.50
-    User root
-    # Unifi Network Controller
-
-Host docker-dmz 
-    HostName 192.168.0.59
-    User root
-    # Docker host with Frigate NVR (formerly frigate VM)
-
-## WORKSTATIONS
-# User Network (192.168.20.x)
-Host omarchy-gem12
-    HostName 192.168.0.12
-    User blake
-    # AOOSTAR Wired
-
-Host omarchy-zentop
-    HostName 192.168.20.13
-    User blake
-    # Archlinux on ASUS Zenbook (via wifi)
+###############################################################################
+## USAGE NOTES
+###############################################################################
+# 
+# At home (Tailscale OFF):
+#   ssh pvenet          → Fast local connection (10.69.10.11)
+#   ssh docker-net      → Direct LAN access
+#   
+# Away from home (Tailscale ON):
+#   ssh pvenet-ts       → Via Tailscale VPN
+#   ssh docker-net-ts   → Via subnet routing through pvenet
+#   
+# Always remote:
+#   ssh ts-proxy        → Your edge proxy/exit node
+#
+###############################################################################

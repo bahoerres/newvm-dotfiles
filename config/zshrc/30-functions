@@ -50,3 +50,139 @@ killp() {
   [[ -z "$1" ]] && echo "usage: killp <process_name>" && return 1
   ps aux | grep -i "$1" | grep -v grep | awk '{print $2}' | xargs kill -9
 }
+
+# -----------------------------------------------------
+# Docker Compose helpers
+# -----------------------------------------------------
+
+# Resolve a compose file from a stack or service name
+# Checks ~/stacks/<name>/compose.yml first, then searches
+# all compose files for a matching service definition
+_dc_resolve() {
+  local name="$1"
+  local compose_file="$HOME/stacks/${name}/compose.yml"
+
+  if [[ -f "$compose_file" ]]; then
+    echo "$compose_file"
+    return 0
+  fi
+
+  # Search for service name across all stacks
+  compose_file=$(grep -rl "^\s*${name}:" ~/stacks/*/compose.yml 2>/dev/null | head -1)
+  if [[ -n "$compose_file" ]]; then
+    echo "$compose_file" >&2  # Inform which file was found
+    echo "$compose_file"
+    return 0
+  fi
+
+  echo "No compose file found for '${name}'" >&2
+  return 1
+}
+
+# Generic docker compose wrapper: dc <stack> <subcommand> [args...]
+# If first arg matches a stack/service, targets that compose file
+# Otherwise falls through to regular docker compose behavior
+dc() {
+  local compose_file
+  if [[ -n "$1" ]] && compose_file=$(_dc_resolve "$1" 2>/dev/null); then
+    shift
+    docker compose -f "$compose_file" "$@"
+  else
+    docker compose "$@"
+  fi
+}
+
+# Down and up a stack by name from anywhere
+dcdu() {
+  local stack="${1:?Usage: dcdu <stack_name>}"
+  local compose_file
+
+  compose_file=$(_dc_resolve "$stack") || return 1
+
+  echo "↓ Bringing down ${stack}..."
+  docker compose -f "$compose_file" down
+  echo "↑ Bringing up ${stack}..."
+  docker compose -f "$compose_file" up -d
+}
+
+# Tail logs for a stack by name from anywhere
+dclog() {
+  local stack="${1:?Usage: dclog <stack_name> [lines]}"
+  local lines="${2:-100}"
+  local compose_file
+
+  compose_file=$(_dc_resolve "$stack") || return 1
+  docker compose -f "$compose_file" logs -f --tail="$lines"
+}
+
+# Quick shell into a container
+dsh() {
+  local container="${1:?Usage: dsh <container_name> [shell]}"
+  local shell="${2:-/bin/sh}"
+  docker exec -it "$container" "$shell"
+}
+
+# Show resource usage for running containers
+dtop() {
+  docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}"
+}
+
+# Pull and recreate a stack (for image updates)
+dcpull() {
+  local stack="${1:?Usage: dcpull <stack_name>}"
+  local compose_file
+
+  compose_file=$(_dc_resolve "$stack") || return 1
+
+  echo "⬇ Pulling latest images for ${stack}..."
+  docker compose -f "$compose_file" pull
+  echo "↻ Recreating ${stack}..."
+  docker compose -f "$compose_file" up -d
+}
+
+# List all stacks and their status
+dls() {
+  for dir in ~/stacks/*/; do
+    local stack=$(basename "$dir")
+    local compose_file="${dir}compose.yml"
+    [[ ! -f "$compose_file" ]] && continue
+
+    local services=$(docker compose -f "$compose_file" ps --format "{{.Name}} {{.Status}}" 2>/dev/null)
+    if [[ -n "$services" ]]; then
+      echo "\033[1;32m● ${stack}\033[0m"
+      echo "$services" | while read -r line; do
+        echo "  $line"
+      done
+    else
+      echo "\033[1;31m○ ${stack}\033[0m (down)"
+    fi
+  done
+}
+
+# -----------------------------------------------------
+# System helpers
+# -----------------------------------------------------
+
+# Quick file/directory size
+sizeof() {
+  du -sh "${1:-.}" 2>/dev/null | cut -f1
+}
+
+# Find large files in current directory
+bigfiles() {
+  local count="${1:-10}"
+  find . -type f -exec du -h {} + 2>/dev/null | sort -rh | head -"$count"
+}
+
+# Watch a command repeatedly (like watch but with color)
+repeat-cmd() {
+  local interval="${1:-2}"
+  shift
+  while true; do
+    clear
+    echo "\033[1;34m$(date)\033[0m"
+    echo "---"
+    eval "$@"
+    sleep "$interval"
+  done
+}

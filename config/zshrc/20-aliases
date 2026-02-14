@@ -58,8 +58,7 @@ alias h='history | grep'
 # -----------------------------------------------------
 # Docker
 # -----------------------------------------------------
-alias dc='docker compose'
-alias dcdu='docker compose down && docker compose up -d'
+# dc, dcdu, dclog, dcpull, dls are now functions in 30-functions
 alias dps='docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
 alias dpsa='docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
 alias dlog='docker logs -f'
