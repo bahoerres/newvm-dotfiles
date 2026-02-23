@@ -92,17 +92,38 @@ dc() {
   fi
 }
 
-# Down and up a stack by name from anywhere
+# Down and up a stack or single service by name from anywhere
 dcdu() {
-  local stack="${1:?Usage: dcdu <stack_name>}"
+  local name="${1:?Usage: dcdu <stack_or_service>}"
   local compose_file
+  local service=""
 
-  compose_file=$(_dc_resolve "$stack") || return 1
+  # Check if it's a stack name (directory exists)
+  if [[ -f "$HOME/stacks/${name}/compose.yml" ]]; then
+    compose_file="$HOME/stacks/${name}/compose.yml"
+  else
+    # Search for service name in compose files
+    compose_file=$(grep -rl "^\s*${name}:" ~/stacks/*/compose.yml 2>/dev/null | head -1)
+    if [[ -n "$compose_file" ]]; then
+      service="$name"
+    else
+      echo "No stack or service found for '${name}'" >&2
+      return 1
+    fi
+  fi
 
-  echo "↓ Bringing down ${stack}..."
-  docker compose -f "$compose_file" down
-  echo "↑ Bringing up ${stack}..."
-  docker compose -f "$compose_file" up -d
+  if [[ -n "$service" ]]; then
+    echo "↓ Bringing down ${service}..."
+    docker compose -f "$compose_file" stop "$service"
+    docker compose -f "$compose_file" rm -f "$service"
+    echo "↑ Bringing up ${service}..."
+    docker compose -f "$compose_file" up -d "$service"
+  else
+    echo "↓ Bringing down ${name} stack..."
+    docker compose -f "$compose_file" down
+    echo "↑ Bringing up ${name} stack..."
+    docker compose -f "$compose_file" up -d
+  fi
 }
 
 # Tail logs for a stack by name from anywhere
